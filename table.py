@@ -57,6 +57,9 @@ chess_figures_information = {
 chess_figures_rects = {}
 chess_board_rects = []
 figure_select = None
+board_row = '12345678'
+board_column = 'abcdefgh'
+figure_move = ''
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -68,13 +71,19 @@ while running:
                         if value.collidepoint(event.pos):
                             chess_figures_information[figure_select]['Position'] = (value[:2])
                             figure_select = None
+                            figure_move += f'{board_column[int((value[0] / cellsize) - 8)]}{int(abs(value[1] / cellsize - 8))}'
+                            figure_move = chess.Move.from_uci(figure_move)
+                            if figure_move in chess_board.legal_moves:
+                                chess_board.push(figure_move)
+                            figure_move = ''
                 else:
                     for key,value in chess_figures_rects.items():
                         if value.collidepoint(event.pos):
+                            figure_move += f'{board_column[int((value[0] / cellsize) - 8)]}{int(abs(value[1] / cellsize - 8))}'
                             figure_select = key
-    screen.fill((255, 255, 255))
     chess_board_rects.clear()
     chess_figures_rects.clear()
+    screen.fill((255, 255, 255))
     for row in range(8):
         for column in range(8):
             if (row + column) % 2 != 0:

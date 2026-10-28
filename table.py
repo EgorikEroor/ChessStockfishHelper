@@ -69,13 +69,13 @@ while running:
                 if figure_select:
                     for value in chess_board_rects:
                         if value.collidepoint(event.pos):
-                            chess_figures_information[figure_select]['Position'] = (value[:2])
-                            figure_select = None
-                            figure_move += f'{board_column[int((value[0] / cellsize) - 8)]}{int(abs(value[1] / cellsize - 8))}'
-                            figure_move = chess.Move.from_uci(figure_move)
-                            if figure_move in chess_board.legal_moves:
-                                chess_board.push(figure_move)
+                            figure_move += f'{board_column[int((value[0] / cellsize) - 8)]}{str(int(abs(value[1] / cellsize - 8)))}'
+                            chess_board_move = chess.Move.from_uci(figure_move)
+                            if chess_board_move in chess_board.legal_moves:
+                                chess_board.push(chess_board_move)
+                                chess_figures_information[figure_select]['Position'] = (value[:2])
                             figure_move = ''
+                            figure_select = None
                 else:
                     for key,value in chess_figures_rects.items():
                         if value.collidepoint(event.pos):

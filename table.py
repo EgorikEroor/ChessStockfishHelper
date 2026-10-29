@@ -1,3 +1,4 @@
+import random
 import sys
 import pygame
 import chess
@@ -8,6 +9,8 @@ tablesize = 576
 cellsize = 72
 cellcolor = ()
 running = True
+import json
+
 file_parent = Path(__file__).parent.resolve()
 stockfish_path = str(file_parent
      / "stockfish-windows-x86-64-universal.exe"
@@ -54,6 +57,11 @@ chess_figures_information = {
     'WR1': {'Image': pygame.image.load(str(file_parent / 'Figures' / 'WR.png')).convert_alpha(), 'Position': (0 * cellsize, 7 * cellsize)},
     'WR2': {'Image': pygame.image.load(str(file_parent / 'Figures' / 'WR.png')).convert_alpha(), 'Position': (7 * cellsize, 7 * cellsize)}
 }
+data = ''
+with open(file_parent / 'config.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+
 chess_figures_rects = {}
 chess_board_rects = []
 figure_select = None
@@ -69,11 +77,18 @@ while running:
                 if figure_select:
                     for value in chess_board_rects:
                         if value.collidepoint(event.pos):
-                            figure_move += f'{board_column[int((value[0] / cellsize) - 8)]}{str(int(abs(value[1] / cellsize - 8)))}'
-                            chess_board_move = chess.Move.from_uci(figure_move)
-                            if chess_board_move in chess_board.legal_moves:
-                                chess_board.push(chess_board_move)
-                                chess_figures_information[figure_select]['Position'] = (value[:2])
+                            pre_move = f'{board_column[int((value[0] / cellsize) - 8)]}{str(int(abs(value[1] / cellsize - 8)))}'
+                            if pre_move != figure_move:
+                                figure_move += pre_move
+                                chess_board_move = chess.Move.from_uci(figure_move)
+                                if chess_board_move in chess_board.legal_moves:
+                                    chess_board.push(chess_board_move)
+                                    chess_figures_information[figure_select]['Position'] = (value[:2])
+                                    chess_analyse = chess_engine.analyse(chess_board, limit=chess.engine.Limit(
+                                        random.uniform(data['time_engine_deliberation_from'],
+                                                       data['time_engine_deliberation_to'])), multipv=data[
+                                        'number_engine_deliberation_move'])
+                                    print(chess_analyse)
                             figure_move = ''
                             figure_select = None
                 else:

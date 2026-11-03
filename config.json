@@ -2,5 +2,5 @@
     "time_engine_deliberation_from": 3,
     "time_engine_deliberation_to": 30,
     "number_engine_deliberation_move": 3,
-    "side_chess_board": 0
+    "side_chess_board": 1
 }
